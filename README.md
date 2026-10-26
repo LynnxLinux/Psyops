@@ -5,10 +5,9 @@ Projeto PHP (padrão Model / DAO / Controller / Views) com a funcionalidade de
 
 ## Dupla
 
-| Integrante | RA / Matrícula |
-|------------|----------------|
-| NOME DO INTEGRANTE 1 | _preencher_ |
-| NOME DO INTEGRANTE 2 | _preencher_ |
+| Integrante |
+|------------|
+| Guilherme |
 
 ## Funcionalidades
 
