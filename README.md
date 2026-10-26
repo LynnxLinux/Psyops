@@ -39,10 +39,6 @@ A busca usa `LIKE '%texto%'`, então encontra o texto em qualquer posição
 Também foram alterados `views/rotas.php` (novas rotas), `views/navbar.php` (novos links)
 e `model/Conn.php` (charset utf8mb4 para acentos).
 
-## Vídeo de demonstração
-
-LINK DO VÍDEO AQUI
-
 ## Métodos utilizados
 
 Veja o arquivo `METODOS.txt`.
