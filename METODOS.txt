@@ -1,0 +1,78 @@
+METODOS UTILIZADOS NO PROCESSO - PESQUISA DE CLIENTE
+Projeto: estrutura-php-backend
+Dupla: NOME DO INTEGRANTE 1 / NOME DO INTEGRANTE 2
+(A pesquisa de Fornecedor segue o mesmo processo, trocando nome por razao_social.)
+
+FLUXO
+View (pesquisar.php) -> Controller -> DAO -> Banco (MySQL) -> DAO -> Controller -> View
+
+--------------------------------------------------------------
+1) VIEW - views/cliente/pesquisar.php
+--------------------------------------------------------------
+- filter_input(INPUT_POST, 'btnpesquisar')
+    Verifica se o formulario foi enviado (botao PESQUISAR clicado).
+- filter_input(INPUT_POST, 'txtnome')
+    Le o texto digitado pelo usuario.
+- trim()
+    Remove espacos no inicio e no fim do texto.
+- new ClienteController() / $controller->pesquisar($nome)
+    Cria o controller e solicita a pesquisa.
+- count($dados)
+    Verifica se a pesquisa retornou registros.
+- foreach ($dados as $mostrar)
+    Percorre o resultado e monta as linhas da tabela (ID, Nome, E-mail).
+- htmlspecialchars()
+    Escapa o texto exibido na tela (protege contra XSS).
+
+--------------------------------------------------------------
+2) CONTROLLER - controller/ClienteController.php
+--------------------------------------------------------------
+- __construct()
+    Instancia o ClienteDAO.
+- pesquisar(string $nome): array
+    Recebe o nome da view e repassa para o DAO, devolvendo a lista encontrada.
+
+--------------------------------------------------------------
+3) DAO - dao/ClienteDAO.php
+--------------------------------------------------------------
+- __construct()
+    Abre a conexao com o banco: new Conn() (PDO).
+- pesquisarPorNome(string $nome): array
+    a) Monta o SQL:
+         SELECT id, nome, email
+           FROM cliente
+          WHERE nome LIKE ?
+       ORDER BY nome ASC
+    b) $this->conn->prepare($sql)
+         Prepara a consulta (prepared statement) - evita SQL Injection.
+    c) addcslashes(trim($nome), "%_\\")
+         Escapa os caracteres % e _ digitados pelo usuario para nao virarem curingas.
+    d) $stmt->bindValue(1, "%" . $nome . "%", PDO::PARAM_STR)
+         Liga o parametro ao ?; os % antes e depois buscam o texto em qualquer
+         posicao do nome (parte ou todo).
+    e) $stmt->execute()
+         Executa a consulta.
+    f) $stmt->fetchAll(PDO::FETCH_ASSOC)
+         Retorna todas as linhas como array associativo (id, nome, email).
+    g) try/catch (PDOException)
+         Trata erros de banco lancando Exception.
+
+--------------------------------------------------------------
+4) MODEL - model/Cliente.php e model/Conn.php
+--------------------------------------------------------------
+- Cliente: atributos id, nome, email com getters/setters tipados (strict_types).
+- Conn extends PDO: __construct() conecta em mysql:host=localhost;dbname=bd_backend;charset=utf8mb4.
+
+--------------------------------------------------------------
+5) SQL - sql/pesquisa_cliente_fornecedor.sql
+--------------------------------------------------------------
+- CREATE TABLE cliente (id, nome, email)
+- INSERT INTO cliente ... (dados de exemplo)
+- SELECT ... WHERE nome LIKE '%Joao%' ORDER BY nome
+
+--------------------------------------------------------------
+6) ROTAS - views/rotas.php
+--------------------------------------------------------------
+- 'pesquisar/cliente'    => 'cliente/pesquisar.php'
+- 'pesquisar/fornecedor' => 'fornecedor/pesquisar.php'
+  (lista branca usada pelo index.php com array_key_exists)
